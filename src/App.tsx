@@ -165,7 +165,9 @@ function App() {
       </div> */}
 
       <div style={{ marginTop: '5em' }}>
-        <sub style={{ color: 'grey' }}>For F, with &#x2764;</sub>
+        <sub style={{ color: 'grey' }}>
+          for F, with ❤️ | <a href="https://github.com/michaelkolber/chem-extract" style={{ color: 'inherit', textDecoration: 'underline', fontWeight: 'inherit' }}>source</a>
+        </sub>
       </div>
     </MantineProvider>
   )
