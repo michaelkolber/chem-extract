@@ -36,4 +36,4 @@ jobs:
         git config --global user.name 'Michael Kolber'
         git config --global user.email 'michaelkolber@users.noreply.github.com'
         git checkout -B pages
-        git subtree push -f --prefix dist origin pages
+        git push origin `git subtree split --prefix dist pages`:pages --force
