@@ -5,7 +5,7 @@ import './App.css'
 import '@mantine/core/styles.css';
 import { MantineProvider, Autocomplete, Table, Space, ActionIcon, Button, CopyButton, TableData } from '@mantine/core';
 import { useLocalStorage, useMap } from '@mantine/hooks';
-import { IconEraser, IconTrash } from '@tabler/icons-react';
+import { IconEraser, IconExternalLink, IconTrash } from '@tabler/icons-react';
 
 import _ from 'lodash';
 
@@ -72,6 +72,7 @@ function App() {
     if (compounds.has(compound.cid)) {
       return;
     }
+    compound.lookupName = name;
     // Display it in the list while we load the rest of the data
     compounds.set(compound.cid, compound);
     await compound.update()
@@ -92,7 +93,15 @@ function App() {
     ],
     body: Array.from(compounds.values(), (compound) => {
       let row = [
-        (<a href={'https://pubchem.ncbi.nlm.nih.gov/compound/' + compound.cid}>{compound.name}</a>),
+        (
+          <a href={'https://pubchem.ncbi.nlm.nih.gov/compound/' + compound.cid}>
+            <div>
+              <span>{compound.lookupName}&nbsp;<IconExternalLink className='icon-external-link'></IconExternalLink></span>
+              <br />
+              <span className='compound-name'>{compound.name}</span>
+            </div>
+          </a>
+        ),
         (<a href={compound.structureLink}><img src={compound.structureLink} height="100px" /></a>),
         compound.molecularWeight,
       ];

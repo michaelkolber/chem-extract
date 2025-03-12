@@ -23,6 +23,8 @@ export async function getCompound(name: string) {
 export class Compound {
     cid: string;
     name: string;
+    /** Name used by the user when searching for the compound. */
+    lookupName: string;
     structureLink: string;
     molecularWeight: string;
     meltingPoint: string[];
