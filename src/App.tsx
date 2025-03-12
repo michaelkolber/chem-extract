@@ -3,7 +3,7 @@ import { useState } from 'react'
 import './App.css'
 
 import '@mantine/core/styles.css';
-import { MantineProvider, Autocomplete, Table, Space, ActionIcon, Button, CopyButton } from '@mantine/core';
+import { MantineProvider, Autocomplete, Table, Space, ActionIcon, Button, CopyButton, TableData } from '@mantine/core';
 import { useLocalStorage, useMap } from '@mantine/hooks';
 import { IconEraser, IconTrash } from '@tabler/icons-react';
 
@@ -12,6 +12,35 @@ import _ from 'lodash';
 import * as pubchem from '@/providers/pubchem';
 
 const LOCALSTORAGE_KEY_TABLE = 'table';
+
+function Header() {
+  return (
+    <header>
+      <h1>
+        <a href="https://pubchem.ncbi.nlm.nih.gov/compound/5754">
+          <img src="/cortisol.svg" style={{ height: '2em' }} />
+        </a>
+      </h1>
+      <h1>Orgo Table Creator</h1>
+    </header>
+  );
+}
+
+function CompoundTable({ data }: { data: TableData }) {
+  if (data.body.length === 0) {
+    return null;
+  }
+  return (
+    <Table
+      id="table"
+      withTableBorder
+      mb="2rem"
+      style={{ textAlign: 'left' }}
+      data={data}
+    >
+    </Table>
+  );
+}
 
 function App() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -50,14 +79,46 @@ function App() {
     setStoredCompounds(compounds);
   }
 
+  const data: TableData = {
+    head: [
+      'Name',
+      'Structure',
+      'Molecular Weight (g/mol)',
+      'Melting Point (°C)',
+      'Boiling Point (°C)',
+      'Density (g/cm³)',
+      'Hazards',
+      '',  // Column for 'Delete' button
+    ],
+    body: Array.from(compounds.values(), (compound) => {
+      let row = [
+        (<a href={'https://pubchem.ncbi.nlm.nih.gov/compound/' + compound.cid}>{compound.name}</a>),
+        (<a href={compound.structureLink}><img src={compound.structureLink} height="100px" /></a>),
+        compound.molecularWeight,
+      ];
+      row = row.concat([compound.meltingPoint, compound.boilingPoint, compound.density, compound.hazard].map((property) => {
+        if (property.length <= 1) {
+          return property[0];
+        }
+        return (
+          <ul>
+            {property.map((value, index) => (<li>{value}</li>))}
+          </ul>
+        )
+      }));
+      row.push(
+        <ActionIcon variant="light" color='blue' aria-label="Remove row" onClick={() => { compounds.delete(compound.cid); setStoredCompounds(compounds) }}>
+          <IconTrash style={{ width: '70%', height: '70%' }} stroke={1.5} />
+        </ActionIcon>
+      );
+
+      return row;
+    }),
+  };
+
   return (
     <MantineProvider>
-      <h1>
-        <a href="https://pubchem.ncbi.nlm.nih.gov/compound/5754">
-          <img src="/cortisol.svg" style={{ height: '2em' }} />
-        </a>
-      </h1>
-      <h1>Orgo Table Creator</h1>
+      <Header />
       <Autocomplete
         autoFocus={true}
         placeholder="Search for any compound"
@@ -65,106 +126,32 @@ function App() {
         onChange={_.debounce(onChange, 500)}
         filter={({ options }) => options}
         onOptionSubmit={onOptionSubmit}
+        mb="2rem"
       />
-      {
-        compounds.size !== 0 && (
-          <>
-            <Space h="xl" />
-            <Table id="table">
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Name</Table.Th>
-                  <Table.Th>Structure</Table.Th>
-                  <Table.Th>Molecular Weight (g/mol)</Table.Th>
-                  <Table.Th>Melting Point (&deg;C)</Table.Th>
-                  <Table.Th>Boiling Point (&deg;C)</Table.Th>
-                  <Table.Th>Density (g/cm&sup3;)</Table.Th>
-                  <Table.Th>Hazards</Table.Th>
-                  <Table.Th>{/* 'Delete' row */}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody style={{ textAlign: 'left' }}>
-                {
-                  Array.from(compounds.values()).map((compound) => (
-                    <Table.Tr key={compound.cid}>
-                      <Table.Td><a href={'https://pubchem.ncbi.nlm.nih.gov/compound/' + compound.cid}>{compound.name}</a></Table.Td>
-                      <Table.Td><img src={compound.structureLink} height="100px" /></Table.Td>
-                      <Table.Td>{compound.molecularWeight}</Table.Td>
-                      {
-                        [compound.meltingPoint, compound.boilingPoint, compound.density].map((property) => (
-                          <Table.Td>
-                            {property.length <= 1 ? property[0] : (
-                              <ul>
-                                {
-                                  property.map((value, index) => (
-                                    <li key={index}>{value}</li>
-                                  ))
-                                }
-                              </ul>
-                            )}
-                          </Table.Td>
-                        ))
-                      }
-                      <Table.Td>
-                        {compound.hazard.length <= 1 ? compound.hazard[0] : (
-                          <ul>
-                            <li key={0}>{compound.hazard[0]}</li>
-                            {
-                              compound.hazard.slice(1).map((value, index) => (
-                                <li key={index + 1}>{value}</li>
-                              ))
-                            }
-                          </ul>
-                        )}
-                      </Table.Td>
-                      <Table.Td>
-                        <ActionIcon variant="light" color='blue' aria-label="Remove row" onClick={() => { compounds.delete(compound.cid); setStoredCompounds(compounds) }}>
-                          <IconTrash style={{ width: '70%', height: '70%' }} stroke={1.5} />
-                        </ActionIcon>
-                      </Table.Td>
-                    </Table.Tr>
-                  ))
-                }
-              </Table.Tbody>
-            </Table>
-            <Space h="xl" />
-            <div>
-              {/* <CopyButton value={document.getElementById('table').outerHTML.trim()}>
-                {({ copied, copy }) => (
-                  <Button color={copied ? 'teal' : 'blue'} onClick={copy}>
-                    {copied ? 'Copied url' : 'Copy url'}
-                  </Button>
-                )}
-              </CopyButton> */}
-              <Button
-                variant="filled"
-                color="red"
-                leftSection={<IconEraser stroke={1.5} />}
-                onClick={() => {
-                  if (confirm('Are you sure you want to clear the entire table?')) {
-                    compounds.clear();
-                    setStoredCompounds(compounds);
-                  }
-                }}>
-                Clear Table
-              </Button>
-            </div>
-          </>
-        )}
-      {/* <div className="card">
-        <button onClick={() => compounds.set('1', new Compound('1', 'Water', '18.01528'))}>
-          Add Water
-        </button>
-        <button onClick={() => {
-          let a = compounds.get('1')!
-          a.boilingPoint = '5'
-          compounds.set('1', a)
-        }}>
-          Update Water
-        </button>
-      </div> */}
+      <CompoundTable data={data} />
+      <div>
+        {/* <CopyButton value={document.getElementById('table').outerHTML.trim()}>
+          {({ copied, copy }) => (
+            <Button color={copied ? 'teal' : 'blue'} onClick={copy}>
+              {copied ? 'Copied url' : 'Copy url'}
+            </Button>
+          )}
+        </CopyButton> */}
+        <Button
+          variant="filled"
+          color="red"
+          leftSection={<IconEraser stroke={1.5} />}
+          onClick={() => {
+            if (confirm('Are you sure you want to clear the entire table?')) {
+              compounds.clear();
+              setStoredCompounds(compounds);
+            }
+          }}>
+          Clear Table
+        </Button>
+      </div>
 
-      <div style={{ marginTop: '5em' }}>
+      <div style={{ marginTop: '5rem' }}>
         <sub style={{ color: 'grey' }}>
           for F, with ❤️ | <a href="https://github.com/michaelkolber/chem-extract" style={{ color: 'inherit', textDecoration: 'underline', fontWeight: 'inherit' }}>source</a>
         </sub>
