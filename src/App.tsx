@@ -94,12 +94,12 @@ function App() {
     body: Array.from(compounds.values(), (compound) => {
       let row = [
         (
-          <a href={'https://pubchem.ncbi.nlm.nih.gov/compound/' + compound.cid}>
-            <div>
-              <span>{compound.lookupName}&nbsp;<IconExternalLink className='icon-external-link'></IconExternalLink></span>
-              <br />
-              <span className='compound-name'>{compound.name}</span>
+          <a href={'https://pubchem.ncbi.nlm.nih.gov/compound/' + compound.cid} className='compound-link' style={{ display: 'block' }}>
+            <div className='name'>
+              <span>{compound.lookupName}</span>
+              <IconExternalLink className='icon-external-link' stroke={3}></IconExternalLink>
             </div>
+            <span className='iupac'>{compound.name}</span>
           </a>
         ),
         (<a href={compound.structureLink}><img src={compound.structureLink} height="100px" /></a>),

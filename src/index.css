@@ -67,16 +67,25 @@ button:focus-visible {
   }
 }
 
-.compound-name {
+.compound-link {
+  display: block;
+}
+
+.compound-link > .name {
+  display: flex;
+  align-items: flex-end;
+  line-height: 0.95;
+}
+
+.icon-external-link {
+  width: 0.8em;
+  height: 0.8em;
+  margin-left: 0.15em;
+}
+
+.compound-link > .iupac {
   font-size: 0.9em;
   font-weight: 400;
   margin: 0;
   color: #73809c;
-}
-
-.icon-external-link {
-  width: 0.9em;
-  height: 0.9em;
-  margin-left: -0.1em;
-  vertical-align: -0.15em;
 }
