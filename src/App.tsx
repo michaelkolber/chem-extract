@@ -11,6 +11,7 @@ import CompoundTable from '@/components/CompoundTable';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { useMapWithLocalStorage } from '@/hooks';
 import * as pubchem from '@/providers/pubchem/pubchem';
+import * as wikidata from '@/providers/wikidata/wikidata';
 import { Compound } from '@/types/compound';
 
 const LOCALSTORAGE_KEY_TABLE = 'table';
@@ -62,6 +63,7 @@ function App() {
   const compounds = useMapWithLocalStorage<string, Compound>(LOCALSTORAGE_KEY_TABLE);
 
   const pc = new pubchem.PubChemProvider();
+  const wd = new wikidata.WikidataProvider();
 
   const onChange = (query: string) => {
     if (query === '') {
@@ -72,7 +74,7 @@ function App() {
   };
 
   const onOptionSubmit = async (name: string) => {
-    const compound = new Compound(name, pc);
+    const compound = new Compound(name, pc, [wd]);
     await compound.init();
     // Display it in the list while we load the rest of the data
     compounds.set(compound.cid, compound);

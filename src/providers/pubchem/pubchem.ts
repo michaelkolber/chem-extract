@@ -1,5 +1,5 @@
 import { PICTOGRAMS } from '@/providers/pubchem/ghs';
-import { deduplicateProperties, Hazard, NumericProperty, PropertyResult, Unit } from '@/types/property';
+import { Hazard, NumericProperty, PropertyResult, Unit } from '@/types/property';
 import { KnownProviders, Provider } from '@/types/provider';
 
 export const BASE_URL = 'https://pubchem.ncbi.nlm.nih.gov';
@@ -7,7 +7,7 @@ export const BASE_URL = 'https://pubchem.ncbi.nlm.nih.gov';
 export const HAZARD_REGEX = /((?:\+?H\d{3}[A-z]*)+)(?: \(.+\))?: ([^\[]+) \[.+\]/;
 
 export class PubChemProvider implements Provider {
-  name: string = KnownProviders.PubChem;
+  name = KnownProviders.PubChem;
 
   static async getSuggestions(query: string): Promise<string[]> {
     const url = constructURL(`/autocomplete/compound/${query}`);
@@ -53,21 +53,21 @@ export class PubChemProvider implements Provider {
       const tocHeading = knownProperties.meltingPoint.at(-1)!;
       const data = await this.getSingleProperty(cid, tocHeading);
       const information = data.Record.Section[0].Section?.[0].Section?.[0].Information;
-      results.meltingPoint = deduplicateProperties(normalizeNumericInformation(cid, tocHeading, information));
+      results.meltingPoint = normalizeNumericInformation(cid, tocHeading, information);
     }
 
     if (isInIndex(knownProperties.boilingPoint, index)) {
       const tocHeading = knownProperties.boilingPoint.at(-1)!;
       const data = await this.getSingleProperty(cid, tocHeading);
       const information = data.Record.Section[0].Section?.[0].Section?.[0].Information;
-      results.boilingPoint = deduplicateProperties(normalizeNumericInformation(cid, tocHeading, information));
+      results.boilingPoint = normalizeNumericInformation(cid, tocHeading, information);
     }
 
     if (isInIndex(knownProperties.density, index)) {
       const tocHeading = knownProperties.density.at(-1)!;
       const data = await this.getSingleProperty(cid, tocHeading);
       const information = data.Record.Section[0].Section?.[0].Section?.[0].Information;
-      results.density = deduplicateProperties(normalizeNumericInformation(cid, tocHeading, information));
+      results.density = normalizeNumericInformation(cid, tocHeading, information);
     }
 
     if (isInIndex(knownProperties.hazards, index)) {

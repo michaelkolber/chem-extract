@@ -2,6 +2,7 @@ import { PropertyResult } from '@/types/property';
 
 export enum KnownProviders {
   PubChem = 'PubChem',
+  Wikidata = 'Wikipedia',
 }
 
 export interface Provider {

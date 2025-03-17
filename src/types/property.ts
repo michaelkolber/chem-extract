@@ -72,7 +72,15 @@ export function compareProperties(a: NumericProperty, b: NumericProperty): numbe
     return bSplitByDecimal.length - aSplitByDecimal.length;
   }
   // Return whichever has the longer decimal part
+  if (bSplitByDecimal[1].length !== aSplitByDecimal[1].length) {
   return bSplitByDecimal[1].length - aSplitByDecimal[1].length;
+  }
+  // Otherwise, prioritize Wikipedia, since it seems to have better-structured data.
+  if (a.source !== b.source) {
+    if (a.source === KnownProviders.Wikidata) return -1;
+    if (b.source === KnownProviders.Wikidata) return 1;
+  }
+  return 0;
 }
 
 export function deduplicateProperties(properties: NumericProperty[]): NumericProperty[] {
@@ -81,7 +89,11 @@ export function deduplicateProperties(properties: NumericProperty[]): NumericPro
     if (seen.has(property.value)) {
       const existing = seen.get(property.value)!;
       // Replace unit-less properties when another property with the same value has a unit.
-      if (existing.unit === Unit.Unknown && property.unit !== Unit.Unknown) {
+      // Also, prefer Wikidata, as it seems to have better-structured data.
+      if (
+        (existing.unit === Unit.Unknown && property.unit !== Unit.Unknown) ||
+        (property.source === KnownProviders.Wikidata && property.unit !== Unit.Unknown)
+      ) {
         seen.set(property.value, property);
       }
       continue;

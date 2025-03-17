@@ -1,5 +1,5 @@
 import * as pubchem from '@/providers/pubchem/pubchem';
-import { compareProperties, Properties } from '@/types/property';
+import { compareProperties, deduplicateProperties, Properties } from '@/types/property';
 import { Provider } from '@/types/provider';
 
 export class Compound {
@@ -49,10 +49,30 @@ export class Compound {
    */
   async populate() {
     const pubchemResults = await this.pc.getProperties(this.cid);
-    this.properties.meltingPoint = pubchemResults.meltingPoint?.sort(compareProperties) ?? [];
-    this.properties.boilingPoint = pubchemResults.boilingPoint?.sort(compareProperties) ?? [];
-    this.properties.density = pubchemResults.density?.sort(compareProperties) ?? [];
-    this.properties.hazards = Array.from(pubchemResults.hazards?.values() ?? []);
-    this.properties.hazards.sort((a, b) => a.code.localeCompare(b.code));
+    let meltingPoint = pubchemResults.meltingPoint ?? [];
+    let boilingPoint = pubchemResults.boilingPoint ?? [];
+    let density = pubchemResults.density ?? [];
+    let hazards = Array.from(pubchemResults.hazards?.values() ?? []);
+
+    for (const provider of this.providers) {
+      try {
+        const results = await provider.getProperties(this.cid);
+        meltingPoint.push(...(results.meltingPoint ?? []));
+        boilingPoint.push(...(results.boilingPoint ?? []));
+        density.push(...(results.density ?? []));
+        hazards.push(...Array.from(results.hazards?.values() ?? []));
+      } catch (e) {
+        console.error(`Failed to get properties from provider '${provider.name}': `, e);
+      }
+    }
+
+    meltingPoint = deduplicateProperties(meltingPoint);
+    boilingPoint = deduplicateProperties(boilingPoint);
+    density = deduplicateProperties(density);
+
+    this.properties.meltingPoint = meltingPoint.sort(compareProperties);
+    this.properties.boilingPoint = boilingPoint.sort(compareProperties);
+    this.properties.density = density.sort(compareProperties);
+    this.properties.hazards = hazards.sort((a, b) => a.code.localeCompare(b.code));
   }
 }

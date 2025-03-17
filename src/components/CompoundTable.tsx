@@ -1,6 +1,6 @@
 import { CompoundMap } from '@/common';
 import { NumericProperty, Unit } from '@/types/property';
-import { ActionIcon, Table } from '@mantine/core';
+import { ActionIcon, Skeleton, Table } from '@mantine/core';
 import { IconExternalLink, IconTrash } from '@tabler/icons-react';
 import { TableData } from 'node_modules/@mantine/core/lib';
 import React from 'react';
@@ -28,6 +28,20 @@ function NumericPropertyList({ properties }: { properties: NumericProperty[] }) 
     );
   });
   return <ul>{items}</ul>;
+}
+
+function PropertySkeleton() {
+  return (
+    <>
+      <Skeleton height={'0.8em'} width={'100%'} className="skeleton" />
+      <Skeleton height={'0.8em'} width={'80%'} className="skeleton" />
+      <Skeleton height={'0.8em'} width={'90%'} className="skeleton" />
+      <Skeleton height={'0.8em'} width={'83%'} className="skeleton" />
+      <Skeleton height={'0.8em'} width={'71%'} className="skeleton" />
+      <Skeleton height={'0.8em'} width={'85%'} className="skeleton" />
+      <Skeleton height={'0.8em'} width={'93%'} className="skeleton" />
+    </>
+  );
 }
 
 interface CompoundTableProps extends React.HtmlHTMLAttributes<HTMLTableElement> {
@@ -97,10 +111,22 @@ export default function CompoundTable({ compounds }: CompoundTableProps) {
 
       body.push([
         nameAndStructure,
-        compound.molecularWeight,
-        <NumericPropertyList properties={compound.properties.meltingPoint} />,
-        <NumericPropertyList properties={compound.properties.boilingPoint} />,
-        <NumericPropertyList properties={compound.properties.density} />,
+        compound.molecularWeight + ' g/mol',
+        compound.properties.meltingPoint.length > 0 ? (
+          <NumericPropertyList properties={compound.properties.meltingPoint} />
+        ) : (
+          <PropertySkeleton />
+        ),
+        compound.properties.boilingPoint.length > 0 ? (
+          <NumericPropertyList properties={compound.properties.boilingPoint} />
+        ) : (
+          <PropertySkeleton />
+        ),
+        compound.properties.density.length > 0 ? (
+          <NumericPropertyList properties={compound.properties.density} />
+        ) : (
+          <PropertySkeleton />
+        ),
         hazards,
         deleteButton,
       ]);

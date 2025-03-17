@@ -97,3 +97,7 @@ sup > a {
   margin: 0;
   color: #73809c;
 }
+
+.skeleton {
+  margin: 0.25em 0;
+}
