@@ -27,6 +27,9 @@ function NumericPropertyList({ properties }: { properties: NumericProperty[] }) 
       </li>
     );
   });
+
+  if (items.length === 0) return '?';
+  if (items.length === 1) return items[0].props.children;
   return <ul>{items}</ul>;
 }
 
@@ -89,7 +92,7 @@ export default function CompoundTable({ compounds }: CompoundTableProps) {
       );
       const hazards = (
         <ul>
-          {compound.properties.hazards.map((h) => (
+          {compound.properties.hazards?.map((h) => (
             <li key={h.code}>
               [{h.code}] {h.hazardStatement}
             </li>
@@ -112,20 +115,20 @@ export default function CompoundTable({ compounds }: CompoundTableProps) {
       body.push([
         nameAndStructure,
         compound.molecularWeight + ' g/mol',
-        compound.properties.meltingPoint.length > 0 ? (
+        compound.properties.meltingPoint === undefined ? (
+          <PropertySkeleton />
+        ) : (
           <NumericPropertyList properties={compound.properties.meltingPoint} />
-        ) : (
-          <PropertySkeleton />
         ),
-        compound.properties.boilingPoint.length > 0 ? (
+        compound.properties.boilingPoint === undefined ? (
+          <PropertySkeleton />
+        ) : (
           <NumericPropertyList properties={compound.properties.boilingPoint} />
-        ) : (
-          <PropertySkeleton />
         ),
-        compound.properties.density.length > 0 ? (
-          <NumericPropertyList properties={compound.properties.density} />
-        ) : (
+        compound.properties.density === undefined ? (
           <PropertySkeleton />
+        ) : (
+          <NumericPropertyList properties={compound.properties.density} />
         ),
         hazards,
         deleteButton,

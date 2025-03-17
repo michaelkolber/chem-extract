@@ -27,10 +27,10 @@ export type Hazard = {
 
 /** Property object as used by a Compound. */
 export interface Properties {
-  meltingPoint: NumericProperty[];
-  boilingPoint: NumericProperty[];
-  density: NumericProperty[];
-  hazards: Hazard[];
+  meltingPoint?: NumericProperty[];
+  boilingPoint?: NumericProperty[];
+  density?: NumericProperty[];
+  hazards?: Hazard[];
 }
 
 export function compareProperties(a: NumericProperty, b: NumericProperty): number {

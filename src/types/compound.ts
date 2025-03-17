@@ -12,10 +12,10 @@ export class Compound {
   structureImageLink: string;
   molecularWeight: string;
   properties: Properties = {
-    meltingPoint: [],
-    boilingPoint: [],
-    density: [],
-    hazards: [],
+    meltingPoint: undefined,
+    boilingPoint: undefined,
+    density: undefined,
+    hazards: undefined,
   };
 
   private pc: pubchem.PubChemProvider;
