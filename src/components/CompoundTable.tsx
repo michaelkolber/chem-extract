@@ -130,7 +130,7 @@ export default function CompoundTable({ compounds }: CompoundTableProps) {
         ) : (
           <NumericPropertyList properties={compound.properties.density} />
         ),
-        hazards,
+        compound.properties.hazards === undefined ? <PropertySkeleton /> : hazards,
         deleteButton,
       ]);
     } catch (error) {

@@ -7,6 +7,7 @@ type ResponseField = [
   'boilingPointUnit',
   'density',
   'densityUnit',
+  'densityUnitLabel',
 ];
 
 interface Binding {
@@ -36,6 +37,7 @@ interface Response {
       boilingPointUnit: Binding;
       density: ValueBinding;
       densityUnit: Binding;
+      densityUnitLabel: Binding;
     }>;
   };
 }

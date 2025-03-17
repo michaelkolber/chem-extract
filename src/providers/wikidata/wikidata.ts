@@ -48,7 +48,13 @@ export class WikidataProvider implements Provider {
       }
       if (row.density) {
         results.density!.push(
-          constructProperty(row.item.value, PROPERTY_MAP.density, row.density.value, row.densityUnit.value),
+          constructProperty(
+            row.item.value,
+            PROPERTY_MAP.density,
+            row.density.value,
+            row.densityUnit.value,
+            row.densityUnitLabel.value,
+          ),
         );
       }
     }
@@ -58,7 +64,7 @@ export class WikidataProvider implements Provider {
 
   private async performQuery(cid: string) {
     const query = `
-      SELECT DISTINCT ?item ?itemLabel ?meltingPoint ?meltingPointUnit ?boilingPoint ?boilingPointUnit ?density ?densityUnit WHERE {
+      SELECT DISTINCT ?item ?itemLabel ?meltingPoint ?meltingPointUnit ?boilingPoint ?boilingPointUnit ?density ?densityUnit ?densityUnitLabel WHERE {
         ?item p:P662 ?statement0.
         ?statement0 ps:P662 "${cid}".
         {
@@ -100,10 +106,17 @@ export class WikidataProvider implements Provider {
   }
 }
 
-function constructProperty(entity: string, property: string, value: string, unit: string): NumericProperty {
+function constructProperty(
+  entity: string,
+  property: string,
+  value: string,
+  unit: string,
+  unitLabel?: string,
+): NumericProperty {
   return {
     value: value,
-    unit: UNIT_MAP[unit] || Unit.Unknown,
+    unit: UNIT_MAP[unit] ?? Unit.Unknown,
+    original: UNIT_MAP[unit] === undefined && typeof unitLabel !== undefined ? value + ' ' + unitLabel : '',
     source: KnownProviders.Wikidata,
     sourceLink: entity + '#' + property,
   };
