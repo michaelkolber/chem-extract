@@ -26,6 +26,7 @@ export function Header() {
         className={animating ? 'animating' : ''}
         onMouseEnter={() => setAnimating(() => true)}
         onAnimationEnd={() => setAnimating(() => false)}
+        title="Don't stress :)"
       >
         <a href="https://pubchem.ncbi.nlm.nih.gov/compound/5754">
           <img src="/cortisol.svg" style={{ height: '2em' }} />
